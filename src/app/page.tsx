@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import { Commit } from "@/types";
 import CommitList from "@/components/CommitList";
 
+
 export default function Home() {
  
   const [commits, setCommits] = useState<Commit[]>([]);
