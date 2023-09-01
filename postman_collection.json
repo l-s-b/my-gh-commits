@@ -1,0 +1,98 @@
+{
+	"info": {
+		"_postman_id": "342959b1-47fe-4025-9672-84cd57c77a55",
+		"name": "GitHub API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "GH User info",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://api.github.com/users/l-s-b",
+					"protocol": "https",
+					"host": [
+						"api",
+						"github",
+						"com"
+					],
+					"path": [
+						"users",
+						"l-s-b"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Repository",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://api.github.com/repos/l-s-b/kcbd-api",
+					"protocol": "https",
+					"host": [
+						"api",
+						"github",
+						"com"
+					],
+					"path": [
+						"repos",
+						"l-s-b",
+						"kcbd-api"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Main Branch Commit List",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://api.github.com/repos/l-s-b/my-gh-commits/commits",
+					"protocol": "https",
+					"host": [
+						"api",
+						"github",
+						"com"
+					],
+					"path": [
+						"repos",
+						"l-s-b",
+						"my-gh-commits",
+						"commits"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Branch List (on GitHub)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://api.github.com/repos/l-s-b/my-gh-commits/branches",
+					"protocol": "https",
+					"host": [
+						"api",
+						"github",
+						"com"
+					],
+					"path": [
+						"repos",
+						"l-s-b",
+						"my-gh-commits",
+						"branches"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
