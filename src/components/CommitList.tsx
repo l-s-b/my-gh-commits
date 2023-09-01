@@ -9,8 +9,13 @@ export default function CommitList({ commits }: { commits: Commit[] }) {
           key={commit.node_id}
           className="border-slate-950 border-4 break-words"
         >
-          <p>SHA: {commit.sha}</p>
-          <p>NODE ID: {commit.node_id}</p>
+            <h2>{commit.commit.message}</h2>
+            <p>by
+                <a href={commit.author.html_url}>
+                    {` ${commit.commit.author.name} (${commit.author.login})`}
+                </a>
+            </p>
+            <p>SHA: {commit.sha}</p>
         </li>
       ))}
     </ul>

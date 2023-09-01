@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function Footer() {
   return (
-    <footer className="flex justify-right p-4 bg-slate-200 text-slate-800 absolute bottom-0 w-full">
+    <footer className="flex justify-end p-4 bg-slate-200 text-slate-800 absolute bottom-0 w-full">
         <p className="text-lg">
             by&nbsp;
             <a
