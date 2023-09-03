@@ -6,6 +6,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Commit } from "@/types";
 import CommitList from "@/components/CommitList";
+import DataInput from "@/components/DataInput";
 
 
 export default function Home() {
@@ -28,11 +29,20 @@ export default function Home() {
   return (
     <>
       <Header />
-      <div className="container p-2 mx-auto">
-        <h1>Commit History</h1>
-        <CommitList commits={commits} />
-      </div>
+      <main>
+        <section
+          className="flex fixed z-30 left-0 w-2/5 m-auto h-screen"
+          style={{display: "flex", alignItems: "center"}}
+        >
+          <DataInput />
+        </section>
+        <section className="absolute z-10 right-0 w-3/5 h-screen pr-20 py-40 flex flex-col gap-6 overflow-y-auto">
+          <h1 className="text-xl font-bold">Commit History</h1>
+          <CommitList commits={commits} />
+        </section>
+      </main>
       <Footer />
     </>
   );
+
 }
