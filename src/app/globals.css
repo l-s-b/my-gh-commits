@@ -1,3 +1,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+ body {
+    --bg-slate-800: rgb(30 41 59 / var(--tw-bg-opacity));
+ }
+
+.vanish {
+    box-shadow: 0 0 3.5rem 3.5rem var(--bg-slate-800) ;
+}
