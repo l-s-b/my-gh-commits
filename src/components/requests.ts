@@ -9,7 +9,7 @@ export function useFetchCommits(): Commit[] {
   useEffect(() => {
     async function getCommitsData() {
       try {
-        const response = await axios.get<Commit[]>(data.thisRepoURL);
+        const response = await axios.get<Commit[]>(data.defaultRepoURL);
         setCommits(response.data);
       } catch (error) {
         throw error;
