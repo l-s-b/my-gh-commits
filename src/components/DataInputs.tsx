@@ -1,7 +1,18 @@
-import React from "react";
+import { useState } from "react";
 
-export default function DataInput() {
+export default function DataInputs() {
+
+  const [user, setUser] = useState("");
+
+  const handleUserSearch = () => {
+
+  }
+
   return (
+    <section
+          className="flex fixed z-30 left-0 w-2/5 m-auto h-screen"
+          style={{display: "flex", alignItems: "center"}}
+        >
     <div
       className="flex flex-col gap-8 w-full m-auto px-4"
     >
@@ -9,7 +20,7 @@ export default function DataInput() {
         <label htmlFor="">GitHub User</label>
         <div className="flex flex-row gap-2">
           <input type="text" className="w-3/4 bg-black" />
-          <button type="button">Go</button>
+          <button type="button" onClick={handleUserSearch}>Go</button>
         </div>
       </div>
       <div className="m-auto">
@@ -27,5 +38,6 @@ export default function DataInput() {
         </div>
       </div>
     </div>
+    </section>
   );
 }
