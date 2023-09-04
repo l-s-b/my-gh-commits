@@ -19,8 +19,14 @@ export type Publisher = {
 export type GHUser = {
     login: string;
     avatar_url: string; //Image source
+    bio: string;
+    public_repos: number;
     html_url: string; // Direct link
     followers_url: string; // API endpoint
     following_url: string; // API endpoint
     repos_url: string; // API endpoint
+}
+
+export type Repository = {
+    name: string;
 }
