@@ -29,4 +29,9 @@ export type GHUser = {
 
 export type Repository = {
     name: string;
+    description: string;
+    html_url: string;
+    created_at: string; // ISO timestamp
+    updated_at: string;
+    size: number // Megabytes
 }

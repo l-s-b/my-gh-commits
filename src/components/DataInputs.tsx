@@ -8,8 +8,8 @@ export default function DataInputs() {
   const [user, setUser] = useState("l-s-b");
   const [repo, setRepo] = useState("my-gh-commits");
   const [branch, setBranch] = useState("main");
-  const [userResult, setUserResult] = useState("");
-  const [repoListResult, setRepoListResult] = useState([]);
+  const [userResultMessage, setUserResultMessage] = useState("");
+  const [repoMenu, setRepoMenu] = useState([]);
   // URL CONSTANTS
   const GITHUB_API_BASE_URL = "https://api.github.com";
   const USER_FULL_URL = `${GITHUB_API_BASE_URL}/users/${user}`;
@@ -24,28 +24,30 @@ export default function DataInputs() {
   const handleRepoListSearch = async (axiosGetURL: string) => {
     try {
       const response = await axios.get(axiosGetURL);
-      console.log("REPO LIST RESPONSE: ", response);
-      setRepoListResult(response.data);
+      setRepoMenu(response.data);
     } catch (error: any) {
-      console.log('REPO LIST ERROR: ', error);
+      setRepoMenu([]);
       throw error;
     }
   };
 
-  const populateRepoList = (repoList: Repository[]) => repoList.map(repo => <option>{repo.name}</option>)
+  const populateRepoMenu = (repoList: Repository[]) => (
+    repoList.length === 0 ? <></> :
+    repoList.map(repo =>
+      <option key={repoList.indexOf(repo) + 1}>{repo.name}</option>
+    )
+  )
 
-
-  const handleSearch = async (entity: string, axiosGetURL: string) => {
+  const handleUserSearch = async (entity: string, axiosGetURL: string) => {
     try {
       const response = await axios.get(axiosGetURL);
-      setUserResult(entity + " OK");
+      setUserResultMessage(entity + " OK");
       handleRepoListSearch(REPOS_FULL_URL);
     } catch (error: any) {
+      setRepoMenu([]);
       if (error.response?.status === 404) {
-        setUserResult(entity + " not found.")
-      } else {
-        throw error;
-      }
+        setUserResultMessage(entity + " not found.")
+      } else throw error;
     }
   };
   // RENDER
@@ -64,17 +66,18 @@ export default function DataInputs() {
               value={user}
               className="w-3/4 bg-black"
             />
-            <button type="button" onClick={() => handleSearch("User", USER_FULL_URL)}>
+            <button type="button" onClick={() => handleUserSearch("User", USER_FULL_URL)}>
               Go
             </button>
           </div>
-          <span>{userResult}</span>
+          <span>{userResultMessage}</span>
         </label>
         <label className="m-auto">
           Repository
           <div className="flex flex-row gap-2">
             <select id="repoList" className="w-3/4 bg-black">
-              {repoListResult.length > 0 && populateRepoList(repoListResult)}
+              <option key="0" disabled>Select...</option>
+              {repoMenu.length > 0 && populateRepoMenu(repoMenu)}
             </select>
             <button type="button">Go</button>
           </div>
