@@ -1,36 +1,56 @@
 import axios, { AxiosError } from "axios";
 import data from "../app/variables.json";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useState, ReactNode } from "react";
+import { Repository } from "@/types";
 
 export default function DataInputs() {
+  // STATES
   const [user, setUser] = useState("l-s-b");
   const [repo, setRepo] = useState("my-gh-commits");
   const [branch, setBranch] = useState("main");
-  const [userResult, setUserResult] = useState("");
-
+  const [userResultMessage, setUserResultMessage] = useState("");
+  const [repoMenu, setRepoMenu] = useState([]);
+  // URL CONSTANTS
   const GITHUB_API_BASE_URL = "https://api.github.com";
   const USER_FULL_URL = `${GITHUB_API_BASE_URL}/users/${user}`;
   const REPOS_FULL_URL = `${USER_FULL_URL}/repos`;
   const REPO_FULL_URL = `${GITHUB_API_BASE_URL}/repos/${user}/${repo}`;
   const BRANCHES_FULL_URL = `${REPO_FULL_URL}/branches`
-
+  // HANDLERS
   const handleUserChange = (e: ChangeEvent<HTMLInputElement>) => {
     setUser(e.target.value);
   };
 
-  const handleSearch = async (entity: string, axiosGetURL: string) => {
+  const handleRepoListSearch = async (axiosGetURL: string) => {
     try {
       const response = await axios.get(axiosGetURL);
-      setUserResult(entity + " OK");
+      setRepoMenu(response.data);
     } catch (error: any) {
-      if (error.response?.status === 404) {
-        setUserResult(entity + " not found.")
-      } else {
-        throw error;
-      }
+      setRepoMenu([]);
+      throw error;
     }
   };
 
+  const populateRepoMenu = (repoList: Repository[]) => (
+    repoList.length === 0 ? <></> :
+    repoList.map(repo =>
+      <option key={repoList.indexOf(repo) + 1}>{repo.name}</option>
+    )
+  )
+
+  const handleUserSearch = async (entity: string, axiosGetURL: string) => {
+    try {
+      const response = await axios.get(axiosGetURL);
+      setUserResultMessage(entity + " OK");
+      handleRepoListSearch(REPOS_FULL_URL);
+    } catch (error: any) {
+      setRepoMenu([]);
+      if (error.response?.status === 404) {
+        setUserResultMessage(entity + " not found.")
+      } else throw error;
+    }
+  };
+  // RENDER
   return (
     <section
       className="flex fixed z-30 left-0 w-2/5 m-auto h-screen"
@@ -46,16 +66,19 @@ export default function DataInputs() {
               value={user}
               className="w-3/4 bg-black"
             />
-            <button type="button" onClick={() => handleSearch("User", USER_FULL_URL)}>
+            <button type="button" onClick={() => handleUserSearch("User", USER_FULL_URL)}>
               Go
             </button>
           </div>
-          <span>{userResult}</span>
+          <span>{userResultMessage}</span>
         </label>
         <label className="m-auto">
           Repository
           <div className="flex flex-row gap-2">
-            <input type="text" className="w-3/4 bg-black" />
+            <select id="repoList" className="w-3/4 bg-black">
+              <option key="0" disabled>Select...</option>
+              {repoMenu.length > 0 && populateRepoMenu(repoMenu)}
+            </select>
             <button type="button">Go</button>
           </div>
         </label>
