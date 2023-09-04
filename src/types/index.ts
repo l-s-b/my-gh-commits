@@ -35,3 +35,14 @@ export type Repository = {
     updated_at: string;
     size: number // Megabytes
 }
+
+export type Branch = {
+    name: string;
+}
+
+export type EntityHandler = {
+    entity: string;
+    menu: string;
+    getUrl: string;
+    menuUrl: string
+}
