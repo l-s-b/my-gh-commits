@@ -1,55 +1,67 @@
 import axios, { AxiosError } from "axios";
-import data from "../app/variables.json";
-import { ChangeEvent, useState, ReactNode } from "react";
-import { Repository, Branch, EntityHandler } from "@/types";
+import { ChangeEvent, useState } from "react";
+import { Repository, Branch, EntityProps, EntityIndex, ResultMessages, Menus, ValidMenuKey } from "@/types";
 
 export default function DataInputs() {
   // STATES
   const [activeUser, setActiveUser] = useState("l-s-b");
   const [activeRepo, setActiveRepo] = useState("my-gh-commits");
-  const [activeBranchSHA, setActiveBranchSHA] = useState("99e05bdcd3c9ee55f2d03d697003a92ab2f3b5cb");
   const [resultMessages, setResultMessages] = useState({
     User: "",
     Repository: "",
     Branch: ""
   });
-  const [menus, setMenus] = useState({
-    Repositories: [],
-    Branches: [],
-    Commits: []
-  });
+  const [menus, setMenus] = useState<Menus>({ Repositories: [], Branches: [], Commits: [] });
   // URL CONSTANTS
   const GITHUB_API_BASE_URL = "https://api.github.com";
   const USER_FULL_URL = `${GITHUB_API_BASE_URL}/users/${activeUser}`;
   const REPOS_FULL_URL = `${USER_FULL_URL}/repos`;
   const REPO_FULL_URL = `${GITHUB_API_BASE_URL}/repos/${activeUser}/${activeRepo}`;
   const BRANCHES_FULL_URL = `${REPO_FULL_URL}/branches`;
-  const BRANCH_FULL_URL = `${REPO_FULL_URL}/branches/${activeBranchSHA}`;
-  const COMMITS_FULL_URL = ``;
-  const COMMIT_FULL_URL = ``;
 
-  // HANDLERS
+const entityIndex = new EntityIndex(
+  new EntityProps("User", "Repositories", "Repository", null, USER_FULL_URL, REPOS_FULL_URL),
+);
+
+entityIndex.userProps.child = new EntityProps(
+  "Repository", "Branches", "Branch", null, REPO_FULL_URL, BRANCHES_FULL_URL
+)
+
+// HANDLERS
   const handleUserChange = (e: ChangeEvent<HTMLInputElement>) => {
     setActiveUser(e.target.value);
+    setActiveRepo("");
   };
-  const handleRepoChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleRepoChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setActiveRepo(e.target.value);
   };
 
-  const refreshMenu = (whichEntity: string, menu: Repository[] | Branch[] | null ) => {
-    setMenus({
-      ...menus,
-      [whichEntity]: JSON.parse(JSON.stringify(menu)) || []
-    });
-    console.log(menus)
-  }
+  const refreshMenu = (whichEntity: keyof Menus, menu: [] | null ) => {
+  const editedMenus: any = { ...menus };
+  editedMenus[whichEntity] = menu || [];
+  setMenus(editedMenus);
+}
 
-  const handleMenuSearch = async (whichMenu: string, axiosGetURL: string) => {
+  const refreshResultMessage: any = (entity: EntityProps, message: keyof ResultMessages) => {
+    const messages: ResultMessages = {
+        ok: `${entity.entityName} OK`,
+        notFound: `${entity.entityName} not found.`,
+        otherError: `Oh, my! ${entity.entityName} search error.`,
+        clear: ''
+    };
+    setResultMessages({
+        ...resultMessages,
+        [entity.entityName]: messages[message]
+    });
+    if (entity.child !== null) {return refreshResultMessage(entity.child, "clear")};
+}
+
+  const getMenu = async ({menuName, menuUrl}: EntityProps) => {
     try {
-      const response = await axios.get(axiosGetURL);
-      refreshMenu(whichMenu, response.data)
+      const response = await axios.get(menuUrl);
+      refreshMenu(menuName, response.data)
     } catch (error: any) {
-      refreshMenu(whichMenu, null)
+      refreshMenu(menuName, null)
       throw error;
     }
   };
@@ -61,40 +73,19 @@ export default function DataInputs() {
     )
   )
 
-  const populateBranchMenu = (branchMenu: Branch[]) => (
-    branchMenu.length === 0 ? <></> :
-    branchMenu.map(branch =>
-      <option key={branchMenu.indexOf(branch) + 1}>{branch.name}</option>
-    )
-  )
-
-  const handleSearch = async (entity: string, menu: string, axiosGetURL: string, getMenuURL: string) => {
+  const handleSearch = async (entityProps: EntityProps) => {
     try {
-      const response = await axios.get(axiosGetURL);
-      setResultMessages({
-        ...resultMessages,
-        [entity]: entity + " OK"
-      });
-      console.log(`\nENTITY: ${entity}\nGET_URL: ${axiosGetURL}\nMENU_URL: ${getMenuURL}`)
-      getMenuURL && handleMenuSearch(menu, getMenuURL);
+      const response = await axios.get(entityProps.getUrl);
+      response.data && refreshResultMessage(entityProps, "clear");
+      response.data && refreshResultMessage(entityProps, "ok")
+      entityProps.menuUrl && getMenu(entityProps);
     } catch (error: any) {
-      refreshMenu(entity, null)
-      if (error.response?.status === 404) {
-        setResultMessages({
-          ...resultMessages,
-          [entity]: entity + " not found."
-        });
-      } else throw error;
+      refreshResultMessage(
+        entityProps,
+        error.response?.status === 404 ? "notFound" : "otherError"
+      );
     }
   };
-
-  const GoButton = ({entity, menu, getUrl, menuUrl}: EntityHandler) => (
-  <button
-    onClick={() => handleSearch(entity, menu, getUrl, menuUrl)}
-  >
-    Go
-  </button>
-  );
 
   // RENDER
   return (
@@ -103,6 +94,7 @@ export default function DataInputs() {
       style={{ display: "flex", alignItems: "center" }}
     >
       <div className="flex flex-col gap-8 w-full m-auto px-4">
+
         <label className="m-auto">
           GitHub User
           <div className="flex flex-row gap-2">
@@ -112,31 +104,30 @@ export default function DataInputs() {
               value={activeUser}
               className="w-3/4 bg-black"
             />
-            <GoButton entity="User" menu="Repositories" getUrl={USER_FULL_URL} menuUrl={REPOS_FULL_URL} />
+            <button onClick={() => { handleSearch(entityIndex.userProps) }}>Go</button>
           </div>
           <span>{resultMessages.User}</span>
         </label>
+
         <label className="m-auto">
           Repository
           <div className="flex flex-row gap-2">
-            <select onChange={handleRepoChange} id="repoList" className="w-3/4 bg-black">
-              <option key="0" disabled>Select...</option>
+            <select
+              onChange={handleRepoChange}
+              id="repoList"
+              className="w-3/4 bg-black"
+              value={activeRepo}
+            >
+              <option key="0" value="placeholder" disabled>Select...</option>
               {menus.Repositories.length > 0 && populateRepoMenu(menus.Repositories)}
             </select>
-            <GoButton entity="Repository" menu="Branches" getUrl={REPO_FULL_URL} menuUrl={BRANCHES_FULL_URL} />
+            <button onClick={() => {
+              entityIndex.userProps.child && handleSearch(entityIndex.userProps.child)
+            }}>Go</button>
           </div>
           <span>{resultMessages.Repository}</span>
         </label>
-        <label className="m-auto">
-          Branch
-          <div className="flex flex-row gap-2">
-          <select id="branchList" className="w-3/4 bg-black">
-              <option key="0" disabled>Select...</option>
-              {menus.Branches.length > 0 && populateBranchMenu(menus.Branches)}
-            </select>
-            <GoButton entity="Branch" menu="Commits" getUrl={BRANCH_FULL_URL} menuUrl={COMMITS_FULL_URL} />
-          </div>
-        </label>
+
       </div>
     </section>
   );
