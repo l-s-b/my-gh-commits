@@ -1,8 +1,16 @@
 import axios, { AxiosError } from "axios";
 import { ChangeEvent, useState, useEffect, EffectCallback } from "react";
-import { Repository, Branch, EntityProps, EntityIndex, ResultMessages, Menus, ValidMenuKey } from "@/types";
+import {
+  Repository,
+  Branch,
+  EntityProps,
+  EntityIndex,
+  ResultMessages,
+  Menus,
+  DataInputsProps
+} from "@/types";
 
-export default function DataInputs() {
+export default function DataInputs({ onRouteSelect, selectedRoute }: DataInputsProps) {
   // STATES
   const [activeUser, setActiveUser] = useState("l-s-b");
   const [activeRepo, setActiveRepo] = useState("my-gh-commits");
@@ -18,7 +26,7 @@ export default function DataInputs() {
   const REPOS_FULL_URL = `${USER_FULL_URL}/repos`;
   const REPO_FULL_URL = `${GITHUB_API_BASE_URL}/repos/${activeUser}/${activeRepo}`;
   const BRANCHES_FULL_URL = `${REPO_FULL_URL}/branches`;
-  const DEFAULT_BRANCH_COMMIT_HISTORY = `${GITHUB_API_BASE_URL}/repos/${activeUser}/${activeRepo}`;
+  const DEFAULT_BRANCH_COMMIT_HISTORY = `${GITHUB_API_BASE_URL}/repos/${activeUser}/${activeRepo}/commits`;
 
 const entityIndex = new EntityIndex(
   new EntityProps("User", "Repositories", "Repository", null, USER_FULL_URL, REPOS_FULL_URL),
@@ -34,7 +42,10 @@ entityIndex.userProps.child = new EntityProps(
     setActiveRepo("");
   };
   const handleRepoChange = (e: ChangeEvent<HTMLSelectElement>) => {
-    setActiveRepo(e.target.value);
+    const selectedRepo = e.target.value;
+    setActiveRepo(selectedRepo);
+    const newRoute = `${GITHUB_API_BASE_URL}/repos/${activeUser}/${selectedRepo}/commits`;
+    onRouteSelect(newRoute);
   };
 
   const refreshMenu = (whichEntity: keyof Menus, menu: [] | null ) => {
@@ -77,7 +88,6 @@ entityIndex.userProps.child = new EntityProps(
   const handleSearch = async (entityProps: EntityProps) => {
     try {
       const response = await axios.get(entityProps.getUrl);
-      response.data && refreshResultMessage(entityProps, "clear");
       response.data && refreshResultMessage(entityProps, "ok")
       entityProps.menuUrl && getMenu(entityProps);
     } catch (error: any) {
