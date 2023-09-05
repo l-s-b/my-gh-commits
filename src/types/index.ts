@@ -75,4 +75,9 @@ export class EntityProps {
         public menuUrl: string
     ) {}
 }
+
+export interface DataInputsProps {
+    onRouteSelect: (route: string) => void;
+    selectedRoute: string;
+  }
     
