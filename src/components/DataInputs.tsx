@@ -1,5 +1,5 @@
 import axios, { AxiosError } from "axios";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useState, useEffect, EffectCallback } from "react";
 import { Repository, Branch, EntityProps, EntityIndex, ResultMessages, Menus, ValidMenuKey } from "@/types";
 
 export default function DataInputs() {
@@ -18,6 +18,7 @@ export default function DataInputs() {
   const REPOS_FULL_URL = `${USER_FULL_URL}/repos`;
   const REPO_FULL_URL = `${GITHUB_API_BASE_URL}/repos/${activeUser}/${activeRepo}`;
   const BRANCHES_FULL_URL = `${REPO_FULL_URL}/branches`;
+  const DEFAULT_BRANCH_COMMIT_HISTORY = `${GITHUB_API_BASE_URL}/repos/${activeUser}/${activeRepo}`;
 
 const entityIndex = new EntityIndex(
   new EntityProps("User", "Repositories", "Repository", null, USER_FULL_URL, REPOS_FULL_URL),
@@ -86,6 +87,11 @@ entityIndex.userProps.child = new EntityProps(
       );
     }
   };
+
+  useEffect(() => {
+    handleSearch(entityIndex.userProps);
+    entityIndex.userProps.child && handleSearch(entityIndex.userProps.child)
+  }, [])
 
   // RENDER
   return (
