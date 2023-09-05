@@ -38,11 +38,41 @@ export type Repository = {
 
 export type Branch = {
     name: string;
+    commit: {
+        sha: string;
+        url: string;
+    }
 }
 
-export type EntityHandler = {
-    entity: string;
-    menu: string;
-    getUrl: string;
-    menuUrl: string
+export class EntityIndex {
+    constructor(public userProps: EntityProps) {}
 }
+
+export interface ResultMessages {
+    ok: string;
+    notFound: string;
+    otherError: string;
+    clear: string;
+}
+
+export class Menus {
+    constructor(
+        public Repositories: Repository[],
+        public Branches: Branch[],
+        public Commits: Commit[],
+    ) {}
+}
+
+export type ValidMenuKey = keyof Menus
+
+export class EntityProps {
+    constructor(
+        public entityName: string,
+        public menuName: ValidMenuKey,
+        public childName: string,
+        public child: EntityProps | null,
+        public getUrl: string,
+        public menuUrl: string
+    ) {}
+}
+    
