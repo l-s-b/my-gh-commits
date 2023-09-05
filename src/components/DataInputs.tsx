@@ -137,9 +137,6 @@ entityIndex.userProps.child = new EntityProps(
               <option key="0" value="placeholder" disabled>Select...</option>
               {menus.Repositories.length > 0 && populateRepoMenu(menus.Repositories)}
             </select>
-            <button onClick={() => {
-              entityIndex.userProps.child && handleSearch(entityIndex.userProps.child)
-            }}>Go</button>
           </div>
           <span>{resultMessages.Repository}</span>
         </label>
