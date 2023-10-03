@@ -14,8 +14,8 @@ export default function CommitList({ commits }: { commits: Commit[] }) {
             <h2>{commit.commit.message}</h2>
             <p>
               by
-              <a href={commit.author.html_url}>
-                {` ${commit.commit.author.name} (${commit.author.login})`}
+              <a href={commit.author?.html_url || commit.committer?.html_url || "#"}>
+                {` ${commit.commit.author.name} (${commit.author?.login || 'Committed by ' + commit.committer?.login})`}
               </a>
             </p>
             <p>SHA: {commit.sha}</p>
