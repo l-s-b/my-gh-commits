@@ -9,6 +9,7 @@ export function useFetchCommits(selectedRoute: string): Commit[] {
   useEffect(() => {
     async function getCommitsData() {
       try {
+        setCommits([]);
         const response = await axios.get<Commit[]>(selectedRoute);
         setCommits(response.data);
       } catch (error) {

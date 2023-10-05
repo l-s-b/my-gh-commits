@@ -8,6 +8,7 @@ export type Commit = {
     }
     html_url: string;
     author: GHUser;
+    committer: GHUser;
   };
 
 export type Publisher = {
