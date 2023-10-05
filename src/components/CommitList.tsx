@@ -18,7 +18,7 @@ export default function CommitList({ commits }: { commits: Commit[] }) {
               </a>
               {` (${commit.author?.login || 'Committed by ' + commit.committer?.login})`}
             </p>
-            <p>SHA: {commit.sha}</p>
+            <p>SHA: {commit.sha.slice(0,7)}</p>
           </li>
         ))}
       </ul>
