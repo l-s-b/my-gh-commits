@@ -2,8 +2,11 @@ import {useMemo} from "react";
 import { Commit } from "@/types";
 import GitHubThrobber from "../assets/GitHubThrobber"
 
-export default function CommitList({ commits }: { commits: Commit[] }) {
-  const CommitsUnorderedList = useMemo(() => (
+export default function CommitList({ commits }: { commits: Commit[] | "Wait" }) {
+  const CommitsUnorderedList = useMemo(() => 
+  commits === "Wait" ? <p>Please select the repo.</p> :
+  <>
+    <h1 className="text-xl font-bold">Commit History</h1>
     <ul>
         {commits.map((commit: Commit) => (
           <li
@@ -22,12 +25,11 @@ export default function CommitList({ commits }: { commits: Commit[] }) {
           </li>
         ))}
       </ul>
-    ), [commits]);
+      </>, [commits]);
 
   return (
     <section className="absolute z-10 right-0 w-3/5 h-screen pr-20 py-40 flex flex-col gap-6 overflow-y-auto">
-      <h1 className="text-xl font-bold">Commit History</h1>
-      {commits.length > 0 ? CommitsUnorderedList : <GitHubThrobber />}
+      {commits.length > 0 ? CommitsUnorderedList : <GitHubThrobber showText={true} />}
     </section>
   )
 }
