@@ -1,6 +1,10 @@
 import React from "react";
 
-export default function GitHubThrobber() {
+interface ThrobberProps {
+  showText: boolean;
+}
+
+export default function GitHubThrobber({ showText }: ThrobberProps) {
   const svgStyle = {
     willChange: "transform",
     animation: "blink 1s linear infinite",
@@ -33,9 +37,10 @@ export default function GitHubThrobber() {
   );
 
   return (
-    <div style={{display: "flex", margin: "auto"}}>
+    <div style={{display: "flex", flexDirection: "column", margin: "auto"}}>
       <style>{ANIMATION_KEYFRAMES}</style>
       {SVG}
+      { showText && <b className="text-lg">Loading . . .</b> }
     </div>
   );
 }
