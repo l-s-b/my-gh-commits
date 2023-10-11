@@ -1,5 +1,5 @@
 import axios, { AxiosError } from "axios";
-import { ChangeEvent, useState, useEffect, EffectCallback } from "react";
+import { ChangeEvent, useState, useEffect } from "react";
 import {
   Repository,
   Branch,
@@ -37,9 +37,8 @@ entityIndex.userProps.child = new EntityProps(
 )
 
 // HANDLERS
-  const handleUserChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleUserInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setActiveUser(e.target.value);
-    setActiveRepo("");
   };
   const handleRepoChange = (e: ChangeEvent<HTMLSelectElement>) => {
     const selectedRepo = e.target.value;
@@ -48,7 +47,10 @@ entityIndex.userProps.child = new EntityProps(
     onRouteSelect(newRoute);
   };
 
-  const refreshMenu = (whichEntity: keyof Menus, menu: [] | null ) => {
+  const refreshMenu = (
+    whichEntity: keyof Menus,
+    menu: [] | null
+  ) => {
   const editedMenus: any = { ...menus };
   editedMenus[whichEntity] = menu || [];
   setMenus(editedMenus);
@@ -85,6 +87,15 @@ entityIndex.userProps.child = new EntityProps(
     )
   )
 
+  const handleGHUserSearch = () => {
+    setActiveRepo("");
+    setMenus({
+      ...menus,
+      Repositories: []
+    })
+    handleSearch(entityIndex.userProps)
+  }
+
   const handleSearch = async (entityProps: EntityProps) => {
     try {
       const response = await axios.get(entityProps.getUrl);
@@ -116,31 +127,31 @@ entityIndex.userProps.child = new EntityProps(
           <div className="flex flex-row gap-2">
             <input
               type="text"
-              onChange={handleUserChange}
+              onChange={handleUserInputChange}
               value={activeUser}
-              className="w-3/4 bg-black"
+              className="w-3/4 px-2 py-1 bg-black"
             />
-            <button onClick={() => { handleSearch(entityIndex.userProps) }}>Go</button>
+            <button onClick={handleGHUserSearch}>Go</button>
           </div>
           <span>{resultMessages.User}</span>
         </label>
-
-        <label className="m-auto">
+        {menus.Repositories.length > 0 && 
+          <label className="m-auto">
           Repository
           <div className="flex flex-row gap-2">
             <select
               onChange={handleRepoChange}
               id="repoList"
-              className="w-3/4 bg-black"
+              className="w-3/4 px-2 py-1 bg-black"
               value={activeRepo}
             >
               <option key="0" value="placeholder" disabled>Select...</option>
-              {menus.Repositories.length > 0 && populateRepoMenu(menus.Repositories)}
+              { populateRepoMenu(menus.Repositories) }
             </select>
           </div>
           <span>{resultMessages.Repository}</span>
         </label>
-
+        }
       </div>
     </section>
   );
